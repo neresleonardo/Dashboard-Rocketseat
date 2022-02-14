@@ -1,37 +1,39 @@
-import { FormControl, FormErrorMessage, FormLabel, Input as ChackaInput, InputProps as ChackraInputProps } from "@chakra-ui/react";
-import React, { forwardRef, ForwardRefRenderFunction } from "react";
-import { FieldError } from 'react-hook-form'
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input as ChakraInput,
+  InputProps as ChakraInputProps
+} from "@chakra-ui/react";
+import { forwardRef, ForwardRefRenderFunction } from "react";
+import { FieldErrors } from "react-hook-form";
 
-interface InputProps extends ChackraInputProps{ 
-    name: string
-    error?: FieldError
+interface InputProps extends ChakraInputProps {
+  name: string;
+  label?: string;
+  error?: FieldErrors
 }
 
-const InputBase: ForwardRefRenderFunction<HTMLInputElement,InputProps> = ({ name, error=null,...rest }, ref) => {
-    return(
-        <FormControl isInvalid={!!error}>
-            
-            <ChackaInput 
-              name={name}
-              id={name}
-              outline={0}
-              focusBorderColor="pink.500"
-              bgColor="gray.900"
-              variant="filled"
-              _hover={{
-                bgColor: 'gray.900'
-              }}
-              size="lg"
-              {...rest}
-              ref={ref}
-            />
-            {error && <FormErrorMessage>
-              {error.message}
-            </FormErrorMessage>}
-          </FormControl>
-    )
+const InputBase: ForwardRefRenderFunction<HTMLInputElement, InputProps> = ({ name, label, error = null, ...rest }, ref) => {
+  return (
+    <FormControl isInvalid={!!error}>
+      {!!label && <FormLabel htmlFor={name}>{label}</FormLabel>}
+      <ChakraInput
+        id={name}
+        name={name}
+        focusBorderColor="pink.500"
+        bgColor="gray.900"
+        variant="filled"
+        _hover={{
+          bgColor: "gray.900"
+        }}
+        ref={ref}
+        size="lg"
+        {...rest}
+      />
+      {!!error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+    </FormControl>
+  );
 }
 
-const Input = forwardRef(InputBase)
-
-export default Input
+export const Input = forwardRef(InputBase)
