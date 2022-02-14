@@ -1,4 +1,3 @@
-
 import { createServer, Factory, Model} from 'miragejs';
 import faker from '@withshepherd/faker';
 
@@ -29,7 +28,7 @@ export function makeServer() {
         },
 
         seeds(server) {
-            server.createList('user', 20)
+            server.createList('user', 30)
         },
         routes(){
 

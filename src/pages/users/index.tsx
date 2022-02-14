@@ -7,14 +7,36 @@ import { Pagination } from '../../components/Pagination';
 import { Sidebar } from "../../components/Sidebar";
 import { useQuery } from "react-query";
 
+type User = {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: string;
+}
+
 export default function UserList() {
 
-    const { data, isLoading, error } = useQuery('users', async () => {
+    const { data, isLoading, isFetching, error, refetch } = useQuery('users', async () => {
        const response= await fetch('http://localhost:3000/api/users')
         const data = await response.json()
-        .then(data => console.log(data))
 
-        return data;
+        const users = data.users.map((user: User) => {
+            return  { 
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                })
+
+             }
+        })
+
+        return users;
+    }, {
+        staleTime: 1000 * 5 // 5 seconds
     })
     
 
@@ -39,6 +61,8 @@ export default function UserList() {
                     <Flex mb="8" justify="space-between" align="center">
                         <Heading size="lg" fontWeight="normal">
                             Usuários
+
+                            {!isLoading && isFetching && <Spinner size="sm" color="gray.500" ml="4" />}
                         </Heading>
 
                         <Link href="/users/create" passHref >
@@ -78,7 +102,7 @@ export default function UserList() {
                             </Tr>
                         </Thead>
                         <Tbody>
-                           {data.users.map(user => {
+                        {data.map((user: User) => {
                                return(
                                 <Tr key={user.id}>
                                 <Td px={["4","4","6"]}>
@@ -88,11 +112,11 @@ export default function UserList() {
                                 </Td>
                                 <Td>
                                     <Box>
-                                        <Text fontWeight="bold">Leonardo Borges</Text>
-                                        <Text fontWeight="sm" color="gray.300">leonardo.borges.neres@gmail.com</Text>
+                                        <Text fontWeight="bold">{user.name}</Text>
+                                        <Text fontWeight="sm" color="gray.300">{user.email}</Text>
                                     </Box>
                                 </Td>
-                            { isWideVersion &&   <Td>17 de Maio de 1998</Td>}
+                            { isWideVersion &&   <Td>{user.createdAt}</Td>}
                                 <Td>
                              {  isWideVersion &&  <Button
                                     as="a"
