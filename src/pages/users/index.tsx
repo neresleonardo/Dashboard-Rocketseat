@@ -1,16 +1,31 @@
-import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody,Text, Td, Th, Thead, Tr, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody,Text, Td, Th, Thead, Tr, useBreakpointValue, Spinner } from "@chakra-ui/react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header/header";
 import { Pagination } from '../../components/Pagination';
 import { Sidebar } from "../../components/Sidebar";
+import { useQuery } from "react-query";
 
 export default function UserList() {
+
+    const { data, isLoading, error } = useQuery('users', async () => {
+       const response= await fetch('http://localhost:3000/api/users')
+        const data = await response.json()
+        .then(data => console.log(data))
+
+        return data;
+    })
+    
 
     const isWideVersion = useBreakpointValue({
         base:false,
         lg:true,
     })
+
+    useEffect(() => {
+       
+    }, [])
 
     return (
         <Box>
@@ -38,7 +53,18 @@ export default function UserList() {
 
                     </Flex>
 
-                    <Table colorScheme="whiteAlpha">
+                  { isLoading ? (
+                      <Flex justify="center">
+                          <Spinner />
+                      </Flex>
+                       
+                  ): error ? (
+                    <Flex justify="center">
+                        <Text>Error</Text>
+                     </Flex>
+                  ) : (
+                    <>
+                     <Table colorScheme="whiteAlpha">
                         <Thead>
                             <Tr>
                                 <Th px={["4","4","6"]} color="gray.300" width="8">
@@ -52,7 +78,9 @@ export default function UserList() {
                             </Tr>
                         </Thead>
                         <Tbody>
-                            <Tr>
+                           {data.users.map(user => {
+                               return(
+                                <Tr key={user.id}>
                                 <Td px={["4","4","6"]}>
 
                                     <Checkbox colorScheme="pink" />
@@ -75,18 +103,18 @@ export default function UserList() {
                                 >Editar</Button>}
                                 </Td>
                             </Tr>
+                               )
+                           })}
                         </Tbody>
                     </Table>
 
-                    <Pagination
-                    totalCountOfRegisters={2}
-                    currentPage={34}
-                    onPageChange={[1]}
-              />
+                    
+                    </>
+                  )}
 
                 </Box>
 
             </Flex>
         </Box>
-    )
+    );
 }
